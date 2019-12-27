@@ -28,11 +28,9 @@
     let linewdtmax = 12;
     let linewdtmin = 100;
     let hue = colormin;
+    let shapes = [];
 
     CanvasHazirla();
-
-
-
 
     function CanvasHazirla() {
       ctx.lineWidth = linewdtmin;
@@ -46,88 +44,59 @@
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    function draw(e) {
-      if (!isDrawing) return; // stop 
-
-      ctx.strokeStyle = `hsl(${hue},100%, 50%)`;
-      ctx.beginPath();
-      // start 
-      ctx.moveTo(lastX, lastY);
-      // go 
-      ctx.lineTo(e.offsetX, e.offsetY);
-      ctx.stroke();
-      [lastX, lastY] = [e.offsetX, e.offsetY];
-      hue++;
-
-      if (hue >= colormax) {
-        hue = 0;
-      }
-      if (ctx.lineWidth >= linewdtmin || ctx.lineWidth <= linewdtmax) {
-        direction = !direction;
-      }
-
-      if (direction) {
-        ctx.lineWidth++;
-      } else {
-        ctx.lineWidth--;
-      }
-
-      ctx.linewidth++;
-    }
-
-    //canvas.addEventListener("mousedown", e => {isDrawing = true;[lastX, lastY] = [e.offsetX, e.offsetY];});    
-    //canvas.addEventListener("mousemove", draw);
-    //canvas.addEventListener("mouseup", () => (isDrawing = false));
-    //canvas.addEventListener("mouseout", () => (isDrawing = false));
-
-
-
-    function DrawGrid(_en, _boy, _offSet) {
-
+    function BuildGrid(_en, _boy, _offSet) {
       let en = _en;
       let boy = _boy;
       let offSet = _offSet;
       let cellSize = (((canvas.height - (offSet * 2)) / boy < (canvas.width - (offSet * 2)) / en) ? (canvas.height - (
         offSet *
         2)) / boy : (canvas.width - (offSet * 2)) / en);
-      let centerwoffSet = (canvas.width - 2 * offSet) / 2 - ((en) * cellSize) / 2;
-      let centerhoffSet = (canvas.height - 2 * offSet) / 2 - ((boy) * cellSize) / 2;
+      let centerwoffSet = (canvas.width - 2 * offSet) / 2 - ((en) * cellSize) / 2 + offSet;
+      let centerhoffSet = (canvas.height - 2 * offSet) / 2 - ((boy) * cellSize) / 2 + offSet;
 
-      if (cellSize < 5) return;
+      if (cellSize < 5) {
+        shapes = [];
+        Draw();
+        return;
+      };
 
       if (debug) {
         console.log('canvas.width', canvas.width, 'canvas.height', canvas.height, 'en', en, 'boy', boy, 'offSet',
           offSet,
           'cellSize', cellSize, 'centerwoffSet', centerwoffSet, 'centerhoffSet', centerhoffSet);
       }
-
-
-      for (let i = 0; i < en + 1; i++) {
-        ctx.moveTo(i * cellSize + offSet + centerwoffSet, offSet + centerhoffSet);
-        ctx.lineTo(i * cellSize + offSet + centerwoffSet, (boy) * cellSize + offSet + centerhoffSet);
-
-        if ((i == 0 || i == en) && debug) {
-          console.log('i', i * cellSize + offSet + centerwoffSet, offSet + centerhoffSet);
-          console.log('i', i * cellSize + offSet + centerwoffSet, (boy) * cellSize + offSet + centerhoffSet);
+      shapes = [];
+      for (let i = 0; i < en; i++) {
+        for (let j = 0; j < boy; j++) {
+          shapes.push({
+            x: i * cellSize + centerwoffSet,
+            y: j * cellSize + centerhoffSet,
+            w: cellSize,
+            h: cellSize,
+            name: "rect"
+          });
         }
       }
-      for (let j = 0; j < boy + 1; j++) {
-        ctx.moveTo(offSet + centerwoffSet, j * cellSize + offSet + centerhoffSet);
-        ctx.lineTo((en) * cellSize + offSet + centerwoffSet, j * cellSize + offSet + centerhoffSet);
 
-        if ((j == 0 || j == boy) && debug) {
-          console.log('j', offSet + centerwoffSet, j * cellSize + offSet + centerhoffSet);
-          console.log('j', (en) * cellSize + offSet + centerwoffSet, j * cellSize + offSet + centerhoffSet);
+      Draw();
+    }
+
+    function Draw() {
+      Reset();
+      ctx.beginPath();
+      for (let index = 0; index < shapes.length; index++) {
+        const e = shapes[index];
+        if (e.name = "rect") {
+          ctx.rect(e.x, e.y, e.w, e.h);
         }
       }
       ctx.stroke();
     }
 
-    DrawGrid(parseInt($("#rngEn").val()), parseInt($("#rngBoy").val()), parseInt($("#rngOffSet").val()));
+    BuildGrid(parseInt($("#rngEn").val()), parseInt($("#rngBoy").val()), parseInt($("#rngOffSet").val()));
 
     function EnBoyDegistir() {
-      Reset();
-      DrawGrid(parseInt($("#rngEn").val()), parseInt($("#rngBoy").val()), parseInt($("#rngOffSet").val()));
+      BuildGrid(parseInt($("#rngEn").val()), parseInt($("#rngBoy").val()), parseInt($("#rngOffSet").val()));
     }
 
     window.onresize = function () {
@@ -136,11 +105,10 @@
 
     function Reset() {
       CanvasHazirla();
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.beginPath();
 
-      ctx.fillStyle = `hsl(0,100%, 95%)`;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+
+
     }
   </script>
 

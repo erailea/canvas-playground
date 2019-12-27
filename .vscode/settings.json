@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/a9deb4c2-7728-4fe6-bddc-491b0a4f7e80/resourceGroups/appsvc_windows_centralus/providers/Microsoft.Web/sites/playgroundjs",
+    "appService.deploySubpath": ""
+}
